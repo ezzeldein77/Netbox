@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>نظام التشغيل الموحد للشركات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+<style>
+:root{--navy:#081428;--deep:#0E2350;--blue:#16397F;--line:#24407A;--sky:#8FB4F2;--text:#E8EEFA;--mute:#A5B4D4;--ok:#6ED6A0;--bad:#FF8A8A;--warn:#F2C879;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--navy);color:var(--text);font:15px/1.7 "IBM Plex Sans Arabic",Tahoma,sans-serif}
+.app{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+aside{background:var(--deep);border-inline-end:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font-size:16px;margin:0 6px 16px}
+aside button.tab{display:block;width:100%;text-align:start;background:none;border:0;color:var(--mute);padding:10px 12px;border-radius:6px;font:inherit;cursor:pointer}
+aside button.tab.on{background:var(--blue);color:#fff}
+button.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.role{margin:18px 6px 0;font-size:13px;color:var(--mute)}
+select,input{background:var(--navy);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit;max-width:100%}
+.role select{width:100%;margin-top:4px}
+main{padding:24px;min-width:0}
+h2{margin:0 0 16px;font-size:22px}
+h3{margin:22px 0 8px;font-size:16px;color:var(--sky)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:14px}
+.kpi b{display:block;font-size:24px}.kpi span{color:var(--mute);font-size:13px}
+.box{background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{text-align:start;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mute);font-weight:500;font-size:13px}
+form.add{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.btn{background:var(--sky);color:var(--navy);border:0;border-radius:6px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.btn.s{background:none;border:1px solid var(--line);color:var(--text);padding:3px 10px;font-weight:400;font-size:13px}
+.tag{padding:2px 10px;border-radius:99px;font-size:12px;background:var(--blue)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col{background:var(--navy);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:120px}
+.col h4{margin:0 0 8px;font-size:14px;color:var(--mute)}
+.task{background:var(--deep);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;font-size:14px}
+.task small{color:var(--mute);display:block}
+.chart{display:flex;align-items:flex-end;gap:14px;height:150px;border-bottom:1px solid var(--line);direction:ltr}
+.chart div{flex:1;text-align:center;font-size:12px;color:var(--mute)}
+.chart i{display:block;background:var(--sky);border-radius:4px 4px 0 0;margin-bottom:4px}
+.login{max-width:340px;margin:12vh auto;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:26px}.login h2{margin-top:0}.login input{width:100%;margin-bottom:10px}.login .btn{width:100%}.err{color:var(--bad);min-height:24px;font-size:14px}.app.out{grid-template-columns:1fr}.who{margin:18px 6px 0;font-size:13px;color:var(--mute)}.who b{color:var(--text);display:block}.who .btn{margin-top:8px;width:100%}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;flex-wrap:wrap;gap:4px;align-items:center}aside h1{width:100%}aside button.tab{width:auto}.role{margin:6px}.board{grid-template-columns:1fr}main{padding:16px}}
+
+body{background:radial-gradient(1200px 700px at 80% -10%,#10285a,transparent 60%),var(--navy);overflow-x:hidden}
+.app{position:relative;z-index:1}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;transition:opacity 1s}.bg svg{width:100%;height:100%;display:block}body.out .bg{opacity:1}
+.w{fill:#8FB4F2;animation:win 5s ease-in-out infinite}.fl{stroke:#5B8DE0;stroke-width:1.2;stroke-dasharray:6 8;animation:flow 3s linear infinite;opacity:.6}
+.nd{fill:#8FB4F2;animation:nd 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.ln{stroke-dasharray:1500;animation:drawl 7s ease-in-out infinite alternate}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);z-index:0;pointer-events:none;animation:float 18s ease-in-out infinite alternate}
+.o1{width:420px;height:420px;background:#1B4DB1;opacity:.35;top:-100px;inset-inline-end:-80px}.o2{width:360px;height:360px;background:#0F6AD6;opacity:.22;bottom:-80px;inset-inline-start:-60px;animation-duration:24s}
+.box,.kpi{background:rgba(14,35,80,.72);backdrop-filter:blur(8px);transition:transform .3s,border-color .3s,box-shadow .3s}
+.kpi:hover,.box:hover{border-color:var(--sky)}.kpi:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.col{background:rgba(8,20,40,.6)}
+aside{background:rgba(14,35,80,.84);backdrop-filter:blur(10px);animation:slide .7s cubic-bezier(.2,.8,.2,1) both}
+aside h1{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#fff,var(--sky),#fff);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+aside button.tab{position:relative;transition:background .3s,color .3s,transform .25s}
+aside button.tab:hover{color:#fff;transform:translateX(-5px);background:rgba(22,57,127,.55)}
+aside button.tab.on::before{content:'';position:absolute;inset-inline-start:0;top:20%;bottom:20%;width:3px;background:var(--sky);border-radius:3px;animation:bar .45s both}
+.btn{position:relative;overflow:hidden;transition:transform .2s,box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(143,180,242,.35)}.btn:active{transform:scale(.95)}
+.btn.s:hover{background:var(--blue);box-shadow:none}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:rip .6s linear;pointer-events:none}
+input,select{transition:border-color .25s,box-shadow .25s}input:focus,select:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(143,180,242,.25)}
+.task{transition:transform .25s,border-color .25s,box-shadow .25s}.task:hover{transform:translateY(-3px);border-color:var(--sky);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+tbody tr{transition:background .25s}tbody tr:hover{background:rgba(22,57,127,.45)}
+td.bad{animation:blink 2s ease-in-out infinite}
+.chart i{transform-origin:bottom;transition:filter .25s}.chart div:hover i{filter:brightness(1.3)}
+#v.in>*{animation:up .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*80ms)}
+#v.in tbody tr,#v.in .task{animation:row .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*50ms + 250ms)}
+#v.in .chart i{animation:grow .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:.3s}
+.pop{animation:pop .7s cubic-bezier(.2,1.3,.3,1) both!important}
+.login{position:relative;backdrop-filter:blur(12px);background:rgba(14,35,80,.8);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+#v.in .login{animation:card .8s cubic-bezier(.2,.9,.3,1.1) both}
+.login.shake{animation:shake .45s}.login .sub{color:var(--mute);font-size:12px;direction:ltr;margin:-6px 0 18px}
+.login input{text-align:start}.logo{display:flex;justify-content:center;margin-bottom:8px}.draw{stroke-dasharray:140;stroke-dashoffset:140;animation:dr 1.6s .2s forwards}.barl{animation:barl 2.4s ease-in-out infinite alternate;transform-origin:bottom;transform-box:fill-box}
+@keyframes win{0%,100%{opacity:.06}50%{opacity:.85}}@keyframes flow{to{stroke-dashoffset:-28}}@keyframes nd{50%{transform:scale(1.9);opacity:.45}}
+@keyframes drawl{from{stroke-dashoffset:1500}to{stroke-dashoffset:0}}@keyframes float{to{transform:translate(60px,40px) scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(22px)}}@keyframes row{from{opacity:0;transform:translateX(30px)}}
+@keyframes pop{0%{opacity:0;transform:scale(.8);box-shadow:0 0 0 0 rgba(143,180,242,.7)}60%{box-shadow:0 0 0 14px rgba(143,180,242,0)}100%{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleY(0)}}@keyframes slide{from{opacity:0;transform:translateX(60px)}}@keyframes bar{from{transform:scaleY(0)}}
+@keyframes rip{to{transform:scale(4);opacity:0}}@keyframes shine{to{background-position:200% center}}@keyframes blink{50%{opacity:.45}}
+@keyframes card{from{opacity:0;transform:translateY(40px) scale(.92)}}@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+@keyframes dr{to{stroke-dashoffset:0}}@keyframes barl{from{transform:scaleY(.55)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside><h1><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><path d="M24 3 43 14v20L24 45 5 34V14z" fill="none" stroke="#8FB4F2" stroke-width="2.5"/><path d="M16 32V22M24 32V14M32 32V19" stroke="#8FB4F2" stroke-width="3.5" stroke-linecap="round"/></svg>نظام التشغيل الموحد</h1><nav id="nav"></nav>
+<div class="who" id="who"></div></aside>
+<main id="v"></main>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n=x=>Number(x||0).toLocaleString('en-US');
+const DEF=()=>({emp:[{id:1,name:'أحمد سمير',job:'مطور',base:12000,allow:1500,abs:1,bal:21},{id:2,name:'منى حسن',job:'محللة أعمال',base:10000,allow:1000,abs:0,bal:21},{id:3,name:'كريم علي',job:'مصمم',base:9000,allow:800,abs:2,bal:21}],
+leaves:[{id:1,emp:2,days:3,st:'معلق'}],
+tasks:[{id:1,t:'تصميم قاعدة البيانات',emp:1,due:'2026-10-20',pri:'عالية',st:0,h:6},{id:2,t:'نماذج الواجهات',emp:3,due:'2026-10-25',pri:'متوسطة',st:1,h:4},{id:3,t:'وثيقة المتطلبات',emp:2,due:'2026-10-12',pri:'عالية',st:2,h:12}],
+cli:[{id:1,name:'شركة النيل للتجارة',note:'عميل منذ 2025'},{id:2,name:'مؤسسة الأفق',note:'اجتماع متابعة شهري'}],
+inv:[{id:1,cli:1,amt:45000,st:'مدفوعة'},{id:2,cli:2,amt:28000,st:'معلقة'},{id:3,cli:1,amt:15000,st:'متأخرة'}],
+exp:[{id:1,t:'إيجار المكتب',amt:12000},{id:2,t:'فواتير ومرافق',amt:3500}]});
+let S=DEF(),tab='dash',role='',me=null,ref=null,fresh=true,prev=new Set(),kp=[];const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const TABS={usr:'المستخدمون',dash:'لوحة المؤشرات',hr:'الموارد البشرية',pro:'المشاريع والمهام',crm:'العملاء والفواتير',fin:'المالية'};
+const ACC={admin:['dash','hr','pro','crm','fin','usr'],hr:['dash','hr'],mgr:['dash','pro','crm'],emp:['pro','hr']};
+const HRM=()=>role==='admin'||role==='hr';
+const save=()=>{try{localStorage.setItem('eos',JSON.stringify(S))}catch(e){}if(ref)ref.set({s:JSON.stringify(S)}).catch(()=>{});draw()};
+const H=async(u,p)=>{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('eos|'+u+'|'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')};
+const RN={admin:'مدير النظام',hr:'موارد بشرية',mgr:'مدير مشاريع',emp:'موظف'};
+const LV=()=>HRM()?S.leaves:S.leaves.filter(l=>l.emp==(me&&me.emp));
+let busy=false;
+async function ensure(){if(S.users||busy)return;busy=true;const seed=[['root','12345678','admin',0],['hr','hr123456','hr',0],['manager','mgr12345','mgr',0],['ahmed','pass1234','emp',1],['mona','pass1234','emp',2],['karim','pass1234','emp',3]];const us=[];for(const[u,p,r,e]of seed)us.push({u,h:await H(u,p),role:r,emp:e});S.users=us;busy=false;save()}
+function setMe(u){fresh=true;me=u;role=u?u.role:'';tab='';try{u?sessionStorage.setItem('eos_u',u.u):sessionStorage.removeItem('eos_u')}catch(e){}draw()}
+const nid=a=>Math.max(0,...a.map(x=>x.id))+1;
+const en=id=>(S.emp.find(e=>e.id==id)||{name:'—'}).name;
+const cn=id=>(S.cli.find(e=>e.id==id)||{name:'—'}).name;
+const net=e=>Math.round(e.base+e.allow-e.base*0.11-e.abs*e.base/30);
+const paid=()=>S.inv.filter(i=>i.st==='مدفوعة').reduce((a,i)=>a+i.amt,0);
+const spent=()=>S.exp.reduce((a,i)=>a+i.amt,0)+S.emp.reduce((a,e)=>a+net(e),0);
+const opts=(a,f)=>a.map(x=>`<option value="${x.id}">${esc(f(x))}</option>`).join('');
+const rows=(h,b)=>`<table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>`;
+
+function dash(){const hrs=S.tasks.reduce((a,t)=>a+t.h,0),done=S.tasks.filter(t=>t.st===2).length;
+const top=S.emp.map(e=>({n:e.name,h:S.tasks.filter(t=>t.emp==e.id).reduce((a,t)=>a+t.h,0)})).sort((a,b)=>b.h-a.h);
+const mx=Math.max(1,...top.map(t=>t.h)),inc=paid(),out=spent();
+return`<h2>لوحة المؤشرات</h2><div class="kpis">
+<div class="kpi"><b>${n(inc)}</b><span>دخل محصّل (ج.م)</span></div>
+<div class="kpi"><b>${n(out)}</b><span>مصاريف ورواتب</span></div>
+<div class="kpi"><b class="${inc-out<0?'bad':'ok'}">${n(inc-out)}</b><span>صافي التدفق</span></div>
+<div class="kpi"><b>${S.tasks.length?Math.round(done/S.tasks.length*100):0}%</b><span>كفاءة تسليم المهام</span></div></div>
+<div class="box"><h3 style="margin-top:0">ساعات العمل لكل موظف (الأعلى إنتاجية: ${esc(top[0]?top[0].n:'—')})</h3><div class="chart">${top.map(t=>`<div><i style="height:${Math.round(t.h/mx*110)+4}px"></i>${t.h}h<br>${esc(t.n)}</div>`).join('')}</div><p style="color:var(--mute);margin:10px 0 0">إجمالي الساعات: ${hrs}</p></div>`}
+
+function hr(){let o=`<h2>الموارد البشرية</h2>`;const mine=S.emp.find(e=>me&&e.id==me.emp);if(!HRM()&&mine)o+=`<div class="kpis"><div class="kpi"><b>${n(net(mine))}</b><span>صافي راتبك</span></div><div class="kpi"><b>${mine.bal}</b><span>رصيد إجازاتك (يوم)</span></div><div class="kpi"><b>${mine.abs}</b><span>أيام الغياب</span></div></div>`;
+if(HRM())o+=`<div class="box"><h3 style="margin-top:0">الموظفون ومسير الرواتب</h3><form class="add" data-f="emp"><input name="name" placeholder="الاسم" required><input name="job" placeholder="الوظيفة" required><input name="base" type="number" min="0" placeholder="الراتب الأساسي" required><input name="allow" type="number" min="0" placeholder="البدلات" value="0"><input name="abs" type="number" min="0" placeholder="أيام الغياب" value="0"><input name="u" placeholder="اسم مستخدم الموظف" required><input name="pw" type="password" minlength="6" placeholder="كلمة المرور" required><button class="btn">إضافة موظف</button></form>
+${rows(['الموظف','الوظيفة','الأساسي','البدلات','غياب','رصيد الإجازات','الصافي',''],S.emp.map(e=>`<tr><td>${esc(e.name)}</td><td>${esc(e.job)}</td><td>${n(e.base)}</td><td>${n(e.allow)}</td><td>${e.abs}</td><td>${e.bal}</td><td><b>${n(net(e))}</b></td><td><button class="btn s" data-a="delemp" data-id="${e.id}">حذف</button></td></tr>`).join(''))}
+<p style="color:var(--mute);font-size:13px">الصافي = الأساسي + البدلات − 11% تأمينات − (الغياب × الأساسي ÷ 30)</p></div>`;
+o+=`<div class="box"><h3 style="margin-top:0">الإجازات</h3><form class="add" data-f="leave">${HRM()?`<select name="emp">${opts(S.emp,e=>e.name)}</select>`:''}<input name="days" type="number" min="1" max="30" placeholder="عدد الأيام" required><button class="btn">تقديم طلب إجازة</button></form>
+${rows(['الموظف','الأيام','الحالة',''],LV().map(l=>`<tr><td>${esc(en(l.emp))}</td><td>${l.days}</td><td class="${l.st==='موافق'?'ok':l.st==='مرفوض'?'bad':'warn'}">${l.st}</td><td>${HRM()&&l.st==='معلق'?`<button class="btn s" data-a="ok" data-id="${l.id}">موافقة</button> <button class="btn s" data-a="no" data-id="${l.id}">رفض</button>`:''}</td></tr>`).join(''))}</div>`;return o}
+
+function pro(){const L=['To Do','In Progress','Done'],can=role!=='emp',TK=role==='emp'?S.tasks.filter(t=>t.emp==(me&&me.emp)):S.tasks;
+return`<h2>المشاريع والمهام</h2>${can?`<form class="add box" data-f="task"><input name="t" placeholder="عنوان المهمة" required><select name="emp">${opts(S.emp,e=>e.name)}</select><input name="due" type="date" required><select name="pri"><option>عالية</option><option>متوسطة</option><option>منخفضة</option></select><button class="btn">إضافة مهمة</button></form>`:''}
+<div class="board">${L.map((l,i)=>`<div class="col"><h4>${l}</h4>${TK.filter(t=>t.st===i).map(t=>`<div class="task"><b>${esc(t.t)}</b><small>${esc(en(t.emp))} · تسليم ${esc(t.due)} · ${esc(t.pri)}</small><small>ساعات مسجلة: ${t.h}</small>
+${i>0?`<button class="btn s" data-a="prev" data-id="${t.id}">‹ رجوع</button> `:''}${i<2?`<button class="btn s" data-a="next" data-id="${t.id}">تقدّم ›</button> `:''}<button class="btn s" data-a="hour" data-id="${t.id}">+1 ساعة</button></div>`).join('')}</div>`).join('')}</div>`}
+
+function crm(){return`<h2>العملاء والفواتير</h2><div class="box"><h3 style="margin-top:0">العملاء</h3><form class="add" data-f="cli"><input name="name" placeholder="اسم العميل" required><input name="note" placeholder="ملاحظات الاتفاق"><button class="btn">إضافة عميل</button></form>
+${rows(['العميل','ملاحظات','إجمالي الفواتير'],S.cli.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.note)}</td><td>${n(S.inv.filter(i=>i.cli==c.id).reduce((a,i)=>a+i.amt,0))}</td></tr>`).join(''))}</div>
+<div class="box"><h3 style="margin-top:0">الفواتير</h3><form class="add" data-f="inv"><select name="cli">${opts(S.cli,c=>c.name)}</select><input name="amt" type="number" min="1" placeholder="المبلغ" required><button class="btn">إنشاء فاتورة</button></form>
+${rows(['#','العميل','المبلغ','الحالة',''],S.inv.map(i=>`<tr><td>${i.id}</td><td>${esc(cn(i.cli))}</td><td>${n(i.amt)}</td><td class="${i.st==='مدفوعة'?'ok':i.st==='متأخرة'?'bad':'warn'}">${i.st}</td><td>${i.st!=='مدفوعة'?`<button class="btn s" data-a="pay" data-id="${i.id}">تسجيل دفع</button> `:''}${i.st==='معلقة'?`<button class="btn s" data-a="late" data-id="${i.id}">متأخرة</button>`:''}</td></tr>`).join(''))}</div>`}
+
+function fin(){const inc=paid(),sal=S.emp.reduce((a,e)=>a+net(e),0),ex=S.exp.reduce((a,i)=>a+i.amt,0);
+return`<h2>المالية التشغيلية</h2><div class="kpis"><div class="kpi"><b class="ok">${n(inc)}</b><span>دخل الفواتير المدفوعة</span></div><div class="kpi"><b>${n(ex)}</b><span>مصاريف تشغيلية</span></div><div class="kpi"><b>${n(sal)}</b><span>رواتب</span></div><div class="kpi"><b class="${inc-ex-sal<0?'bad':'ok'}">${n(inc-ex-sal)}</b><span>التدفق المالي الحالي</span></div></div>
+<div class="box"><form class="add" data-f="exp"><input name="t" placeholder="بند المصروف (إيجار، فاتورة...)" required><input name="amt" type="number" min="1" placeholder="المبلغ" required><button class="btn">تسجيل مصروف</button></form>
+${rows(['البند','المبلغ',''],S.exp.map(x=>`<tr><td>${esc(x.t)}</td><td>${n(x.amt)}</td><td><button class="btn s" data-a="delexp" data-id="${x.id}">حذف</button></td></tr>`).join(''))}</div>`}
+
+function usr(){return`<h2>المستخدمون والصلاحيات</h2><div class="box"><form class="add" data-f="usr"><input name="u" placeholder="اسم المستخدم" required><input name="pw" type="password" minlength="6" placeholder="كلمة المرور" required><select name="r"><option value="hr">موارد بشرية</option><option value="mgr">مدير مشاريع</option><option value="emp">موظف</option></select><select name="emp">${opts(S.emp,e=>e.name)}</select><button class="btn">إنشاء حساب</button></form>${rows(['المستخدم','الدور','الموظف المرتبط',''],(S.users||[]).map(u=>`<tr><td>${esc(u.u)}</td><td>${RN[u.role]}</td><td>${u.emp?esc(en(u.emp)):'—'}</td><td><button class="btn s" data-a="resetpw" data-u="${esc(u.u)}">تغيير كلمة المرور</button> ${u.u==='root'?'':`<button class="btn s" data-a="deluser" data-u="${esc(u.u)}">حذف</button>`}</td></tr>`).join(''))}</div><p style="color:var(--mute);font-size:13px">لا يوجد تسجيل ذاتي: الحسابات يُنشئها مدير النظام فقط، وحساب root لا يُحذف.</p>`}
+
+function count(el,t){const m=t.match(/^(-?)([\d,]+)(%?)$/);if(!m||RM)return;const to=+m[2].replace(/,/g,''),t0=performance.now(),f=now=>{const p=Math.min(1,(now-t0)/900),e=1-Math.pow(1-p,3);el.textContent=m[1]+Math.round(to*e).toLocaleString('en-US')+m[3];if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+function after(){const v=$('#v'),cur=new Set();
+v.querySelectorAll('tbody tr,.task').forEach((el,i)=>{const c=el.closest('.col'),k=tab+(c?c.querySelector('h4').textContent:'')+el.textContent;cur.add(k);if(fresh)el.style.setProperty('--i',i);else if(!prev.has(k))el.classList.add('pop')});prev=cur;
+const ks=[...v.querySelectorAll('.kpi b')],tx=ks.map(b=>b.textContent);ks.forEach((b,i)=>{if(fresh||kp[i]!==tx[i])count(b,tx[i])});kp=tx;
+v.classList.toggle('in',fresh);[...v.children].forEach((c,i)=>c.style.setProperty('--i',i));fresh=false}
+const LOGO='<svg viewBox="0 0 48 48" width="58" height="58" aria-hidden="true"><path class="draw" d="M24 3 43 14v20L24 45 5 34V14z" fill="none" stroke="#8FB4F2" stroke-width="2"/><g stroke="#8FB4F2" stroke-width="3.5" stroke-linecap="round"><path class="barl" d="M16 32V22"/><path class="barl" style="animation-delay:.4s" d="M24 32V14"/><path class="barl" style="animation-delay:.8s" d="M32 32V19"/></g></svg>';
+function draw(){document.body.classList.toggle('out',!me);if(me){me=(S.users||[]).find(x=>x.u===me.u)||null;role=me?me.role:''}
+$('.app').classList.toggle('out',!me);$('aside').style.display=me?'':'none';
+if(!me){$('#v').innerHTML=`<form class="login" data-f="login"><div class="logo">${LOGO}</div><h2>تسجيل الدخول</h2><p class="sub">General Enterprise Operations System</p><input name="u" placeholder="اسم المستخدم" autocomplete="username" required><input name="p" type="password" placeholder="كلمة المرور" autocomplete="current-password" required><div class="err" id="err" role="alert"></div><button class="btn">دخول</button></form>`;after();return}
+const a=ACC[role];if(!a.includes(tab))tab=a[0];
+$('#who').innerHTML=`<b>${esc(me.u)}</b>${RN[role]}<button class="btn s" data-a="out">تسجيل الخروج</button>`;
+$('#nav').innerHTML=a.map(k=>`<button class="tab ${k===tab?'on':''}" data-tab="${k}">${TABS[k]}</button>`).join('');
+$('#v').innerHTML={dash,hr,pro,crm,fin,usr}[tab]();after()}
+
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-a]');if(!t)return;
+if(t.dataset.tab){tab=t.dataset.tab;fresh=true;return draw()}
+const id=+t.dataset.id,a=t.dataset.a,f=(arr)=>arr.find(x=>x.id===id);
+if(a==='out')return setMe(null);
+const AM=()=>role==='admin'||role==='mgr',G={delemp:HRM,ok:HRM,no:HRM,pay:AM,late:AM,delexp:()=>role==='admin',deluser:()=>role==='admin',resetpw:()=>role==='admin'};
+if(G[a]&&!G[a]())return;
+if(['next','prev','hour'].includes(a)&&role==='emp'&&f(S.tasks).emp!=me.emp)return;
+if(a==='delemp'){S.users=S.users.filter(x=>x.emp!==id)}
+if(a==='deluser'){const u=S.users.find(x=>x.u===t.dataset.u);if(!u||u.u==='root')return;S.users=S.users.filter(x=>x!==u)}
+if(a==='resetpw'){const u=S.users.find(x=>x.u===t.dataset.u),p=prompt('كلمة المرور الجديدة (6 أحرف على الأقل)');if(!u||!p||p.length<6)return;H(u.u,p).then(h=>{u.h=h;save()});return}
+if(a==='delemp')S.emp=S.emp.filter(x=>x.id!==id);
+if(a==='ok'||a==='no'){const l=f(S.leaves),m=S.emp.find(x=>x.id==l.emp);
+ if(a==='ok'){if(m&&m.bal>=l.days){m.bal-=l.days;l.st='موافق'}else{alert('رصيد الإجازات غير كافٍ');return}}else l.st='مرفوض'}
+if(a==='next')f(S.tasks).st++;if(a==='prev')f(S.tasks).st--;if(a==='hour')f(S.tasks).h++;
+if(a==='pay')f(S.inv).st='مدفوعة';if(a==='late')f(S.inv).st='متأخرة';
+if(a==='delexp')S.exp=S.exp.filter(x=>x.id!==id);
+save()});
+document.addEventListener('submit',async e=>{const fm=e.target.closest('form[data-f]');if(!fm)return;e.preventDefault();
+const d=Object.fromEntries(new FormData(fm)),k=fm.dataset.f,AM=role==='admin'||role==='mgr';
+if(k==='login'){const u=(S.users||[]).find(x=>x.u===d.u.trim().toLowerCase());if(u&&u.h===await H(u.u,d.p))setMe(u);else{$('#err').textContent='اسم المستخدم أو كلمة المرور غير صحيحة';fm.classList.remove('shake');void fm.offsetWidth;fm.classList.add('shake')}return}
+if(!me)return;
+if(k==='emp'||k==='usr'){const uu=d.u.trim().toLowerCase();if(!/^[a-z0-9_.-]{3,}$/.test(uu)){alert('اسم المستخدم: 3 أحرف أو أكثر بالإنجليزية وأرقام');return}
+ if(S.users.some(x=>x.u===uu)){alert('اسم المستخدم مستخدم بالفعل');return}
+ const h=await H(uu,d.pw);
+ if(k==='emp'&&HRM()){const id=nid(S.emp);S.emp.push({id,name:d.name,job:d.job,base:+d.base,allow:+d.allow||0,abs:+d.abs||0,bal:21});S.users.push({u:uu,h,role:'emp',emp:id})}
+ else if(k==='usr'&&role==='admin'&&['hr','mgr','emp'].includes(d.r))S.users.push({u:uu,h,role:d.r,emp:d.r==='emp'?+d.emp:0});
+ else return}
+if(k==='leave'){const em=HRM()?+d.emp:me.emp;if(!em)return;S.leaves.push({id:nid(S.leaves),emp:em,days:+d.days,st:'معلق'})}
+if(k==='task'&&role!=='emp')S.tasks.push({id:nid(S.tasks),t:d.t,emp:+d.emp,due:d.due,pri:d.pri,st:0,h:0});
+if(k==='cli'&&AM)S.cli.push({id:nid(S.cli),name:d.name,note:d.note||''});
+if(k==='inv'&&AM)S.inv.push({id:nid(S.inv),cli:+d.cli,amt:+d.amt,st:'معلقة'});
+if(k==='exp'&&role==='admin')S.exp.push({id:nid(S.exp),t:d.t,amt:+d.amt});
+save()});
+
+try{const l=localStorage.getItem('eos');if(l)S=JSON.parse(l)}catch(e){}
+function restore(){try{const su=sessionStorage.getItem('eos_u'),u=S.users&&S.users.find(x=>x.u===su);if(u&&!me){me=u;role=u.role}}catch(e){}}
+const boot=()=>ensure().then(()=>{restore();draw()});
+draw();boot();
+(async()=>{try{const db=await window.claude.use('db');if(!db)return;ref=db.doc('app/state');
+ ref.onSnapshot(s=>{if(s.exists){try{S=JSON.parse(s.data().s);draw();boot()}catch(e){}}},()=>{})}catch(e){}})();
+
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('.btn');if(!b||RM)return;const r=b.getBoundingClientRect(),z=Math.max(r.width,r.height),sp=document.createElement('span');sp.className='rip';sp.style.cssText=`width:${z}px;height:${z}px;left:${e.clientX-r.left-z/2}px;top:${e.clientY-r.top-z/2}px`;b.appendChild(sp);setTimeout(()=>sp.remove(),600)});
+(function(){let r=7;const Q=()=>(r=r*16807%2147483647)/2147483647;let b='',x=-20;
+while(x<1220){const w=50+Q()*60|0,h=130+Q()*250|0,y=700-h;b+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#g1)" stroke="#24407A"/>`;
+for(let wy=y+14;wy<686;wy+=18)for(let wx=x+8;wx<x+w-10;wx+=14)if(Q()<.4)b+=`<rect class="w" x="${wx}" y="${wy}" width="6" height="9" style="animation-delay:-${(Q()*8).toFixed(1)}s"/>`;x+=w+6+(Q()*10|0)}
+const N=[[120,120],[300,60],[480,150],[660,70],[840,140],[1020,60],[1100,170],[560,260],[260,230]],E=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[2,7],[7,4],[0,8],[8,2]];
+const g=E.map(([a,c])=>`<line class="fl" x1="${N[a][0]}" y1="${N[a][1]}" x2="${N[c][0]}" y2="${N[c][1]}"/>`).join('')+N.map((p,i)=>`<circle class="nd" cx="${p[0]}" cy="${p[1]}" r="5" style="animation-delay:-${(i*.7).toFixed(1)}s"/>`).join('');
+const d=document.createElement('div');d.className='bg';d.setAttribute('aria-hidden','true');
+d.innerHTML=`<svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16397F" stop-opacity=".75"/><stop offset="1" stop-color="#0E2350" stop-opacity=".95"/></linearGradient></defs><g>${g}</g><polyline class="ln" points="0,420 120,400 240,410 360,350 480,360 600,300 720,310 840,240 960,250 1080,180 1200,150" fill="none" stroke="#8FB4F2" stroke-width="2.5"/>${b}</svg>`;
+document.body.prepend(d);document.body.insertAdjacentHTML('afterbegin','<i class="orb o1"></i><i class="orb o2"></i>')})();
+</script>
+</body>
+</html>
